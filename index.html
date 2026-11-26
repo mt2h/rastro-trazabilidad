@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RASTRO · Sigue el rastro de tu café</title>
+  <meta name="description" content="Sigue el camino de cada lote de café RASTRO, desde la finca en Caranavi, Bolivia, hasta tu taza. Mapa interactivo, utensilios y recetas para prepararlo bien.">
+  <meta property="og:title" content="RASTRO · Sigue el rastro de tu café">
+  <meta property="og:description" content="Del origen a tu taza: la ruta de cada lote de café de especialidad, con recetas para prepararlo.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mt2h.github.io/rastro-trazabilidad/">
+  <meta property="og:image" content="https://mt2h.github.io/rastro-trazabilidad/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#fdf3fa">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/logo-mark.svg">
+  <link rel="icon" type="image/png" href="assets/brand/favicon.png">
+
+  <link rel="preload" href="assets/rastro_bag_hd.webp" as="image" type="image/webp">
+  <link rel="preload" href="assets/fonts/sora-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-lot="lote-3">
+  <!-- Icon set. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z" fill="currentColor"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 2.2-5.1M5 5v4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <div class="haze" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+
+  <a class="skip" href="#ruta">Saltar a la ruta</a>
+
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="RASTRO, inicio">
+      <img src="assets/brand/logo-mark.svg" width="44" height="44" alt="">
+      <span>RASTRO</span>
+    </a>
+    <nav aria-label="Principal">
+      <span class="nav__marker" aria-hidden="true"></span>
+      <a href="#ruta">El rastro</a>
+      <a href="#preparar">Preparar</a>
+    </nav>
+    <a class="nav__cta" href="#comprar">Comprar <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    <span class="nav__thread" aria-hidden="true"></span>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__copy">
+        <h1 id="hero-title" data-words>Cada café <strong>deja un rastro.</strong></h1>
+        <p class="lead" data-reveal="blur">Sigue el camino de este lote desde la finca en las montañas de Caranavi hasta la taza que tienes en la mano.</p>
+        <div class="hero__actions" data-reveal="up">
+          <a class="btn btn--primary" href="#ruta" id="cta-route">Seguir el rastro
+            <svg class="icon" aria-hidden="true"><use href="#i-down"/></svg></a>
+          <a class="btn btn--glass" href="#lotes">Ver lotes</a>
+        </div>
+      </div>
+
+      <div class="hero__stage" id="stage">
+        <div class="disc" aria-hidden="true"><i></i></div>
+        <div class="gear gear--a" data-gear="v60"></div>
+        <div class="gear gear--b" data-gear="chemex"></div>
+        <div class="gear gear--c" data-gear="aeropress"></div>
+        <div class="gear gear--d" data-gear="kettle"></div>
+        <div class="bag" id="bag" data-tilt>
+          <img class="bag__img" src="assets/rastro_bag_hd.webp" width="900" height="1120"
+               alt="Bolsa de café RASTRO, morada y mate, con el logo, el nombre y un rastro de granos de café">
+          <span class="bag__sheen" aria-hidden="true"></span>
+          <span class="bag__sweep" aria-hidden="true"></span>
+          <i class="spark spark--1" aria-hidden="true"></i><i class="spark spark--2" aria-hidden="true"></i><i class="spark spark--3" aria-hidden="true"></i>
+        </div>
+        <span class="bag__floor" aria-hidden="true"></span>
+        <div class="sparkles" aria-hidden="true">
+          <i class="spark" style="--x:31%;--y:20%;--s:1.5rem;--d:-1.8s;--t:3.6s"></i>
+          <i class="spark spark--gold" style="--x:69%;--y:17%;--s:1.1rem;--d:-3.7s;--t:3.4s"></i>
+          <i class="spark" style="--x:21%;--y:43%;--s:1.0rem;--d:-2.0s;--t:3.7s"></i>
+          <i class="spark" style="--x:80%;--y:38%;--s:1.7rem;--d:-0.7s;--t:3.5s"></i>
+          <i class="spark spark--gold" style="--x:37%;--y:70%;--s:1.2rem;--d:-2.5s;--t:4.1s"></i>
+          <i class="spark" style="--x:65%;--y:74%;--s:0.9rem;--d:-0.4s;--t:3.1s"></i>
+          <i class="spark spark--gold" style="--x:50%;--y:10%;--s:1.3rem;--d:-0.4s;--t:4.2s"></i>
+          <i class="spark" style="--x:44%;--y:88%;--s:0.8rem;--d:-2.8s;--t:2.5s"></i>
+          <i class="spark spark--pink" style="--x:58%;--y:85%;--s:1.1rem;--d:-3.9s;--t:4.5s"></i>
+          <i class="spark" style="--x:16%;--y:60%;--s:1.4rem;--d:-2.6s;--t:3.8s"></i>
+          <i class="spark spark--gold" style="--x:84%;--y:62%;--s:1.0rem;--d:-0.6s;--t:2.4s"></i>
+          <i class="spark spark--pink" style="--x:26%;--y:31%;--s:0.8rem;--d:-2.1s;--t:2.5s"></i>
+          <i class="spark" style="--x:74%;--y:27%;--s:0.9rem;--d:-0.8s;--t:2.9s"></i>
+          <i class="spark" style="--x:41%;--y:24%;--s:0.7rem;--d:-0.1s;--t:3.4s"></i>
+          <i class="spark spark--gold" style="--x:61%;--y:31%;--s:1.0rem;--d:-1.8s;--t:4.3s"></i>
+          <i class="spark spark--pink" style="--x:33%;--y:52%;--s:0.7rem;--d:-2.1s;--t:3.8s"></i>
+          <i class="spark" style="--x:68%;--y:55%;--s:0.8rem;--d:-2.0s;--t:3.9s"></i>
+          <i class="spark spark--gold" style="--x:47%;--y:78%;--s:0.7rem;--d:-1.8s;--t:3.0s"></i>
+          <i class="spark" style="--x:54%;--y:19%;--s:0.6rem;--d:-4.0s;--t:4.6s"></i>
+          <i class="spark" style="--x:24%;--y:76%;--s:0.9rem;--d:-3.4s;--t:4.0s"></i>
+          <i class="spark" style="--x:76%;--y:80%;--s:1.2rem;--d:-1.3s;--t:2.9s"></i>
+          <i class="spark spark--gold" style="--x:12%;--y:30%;--s:0.8rem;--d:-1.2s;--t:2.6s"></i>
+          <i class="spark spark--pink" style="--x:90%;--y:48%;--s:0.8rem;--d:-3.1s;--t:3.3s"></i>
+          <i class="spark" style="--x:8%;--y:50%;--s:0.6rem;--d:-3.4s;--t:3.3s"></i>
+        </div>
+      </div>
+    </section>
+
+    <section class="lots" id="lotes" aria-labelledby="lots-title">
+      <div class="wrap">
+        <h2 id="lots-title" data-reveal="blur" data-glow-text>Tu lote</h2>
+        <p class="lede" data-reveal="blur">Elige un lote para ver su ruta y sus datos.</p>
+        <div class="seg" role="tablist" aria-label="Lotes disponibles" id="lot-tabs" data-reveal="up"></div>
+        <dl class="facts glass" id="facts" data-spot data-reveal="up"></dl>
+      </div>
+    </section>
+
+    <section class="route" id="ruta" aria-labelledby="route-title">
+      <div class="wrap wrap--wide">
+        <h2 id="route-title" data-reveal="blur" data-glow-text>De la finca a tu taza</h2>
+        <p class="lede" id="route-summary"></p>
+        <div class="route__grid">
+          <div class="map-wrap glass" id="map-wrap" data-reveal="scale">
+            <div id="map" role="application" aria-label="Mapa interactivo de la ruta del lote"></div>
+            <p class="stage-counter" id="stage-counter" aria-live="polite" hidden></p>
+            <div class="map-controls">
+              <button class="btn btn--primary" id="play" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#i-play"/></svg><span>Seguir el rastro</span>
+              </button>
+              <span class="legend"><i class="legend__solid"></i>Confirmado</span>
+              <span class="legend"><i class="legend__faint"></i>Por confirmar</span>
+            </div>
+          </div>
+          <ol class="timeline" id="timeline" aria-label="Etapas del recorrido"></ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="brew" id="preparar" aria-labelledby="brew-title">
+      <div class="wrap wrap--wide">
+        <h2 id="brew-title" data-reveal="blur" data-glow-text>Prepáralo bien</h2>
+        <p class="lede" data-reveal="blur">Elige tu método, ajusta la dosis y sigue el temporizador paso a paso. Son recetas base: parte de aquí y ajusta a tu gusto.</p>
+        <div class="brew__grid">
+          <div class="brew__methods" id="brew-tabs" role="tablist" aria-label="Método de preparación" data-reveal="up"></div>
+          <div class="brew__stage glass" data-spot data-reveal="scale">
+            <div class="brew__gear" id="brew-gear"></div>
+            <div class="gauge" aria-hidden="true"><i id="gauge-fill"></i></div>
+            <p class="brew__water" id="brew-water" aria-live="polite"></p>
+          </div>
+          <div class="brew__panel glass" data-spot data-reveal="up">
+            <h3 id="brew-name"></h3>
+            <p class="brew__summary" id="brew-summary"></p>
+            <p class="brew__fit" id="brew-fit"></p>
+            <dl class="brew__facts" id="brew-facts"></dl>
+            <label class="dose" for="dose">
+              <span>Dosis de café</span>
+              <output id="dose-out" for="dose"></output>
+              <input id="dose" type="range" step="1">
+            </label>
+            <div class="timer">
+              <div class="timer__ring" id="timer-ring"><span id="timer-clock">0:00</span></div>
+              <div class="timer__buttons">
+                <button class="btn btn--primary" id="timer-toggle" type="button"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg><span>Iniciar</span></button>
+                <button class="btn btn--glass" id="timer-reset" type="button"><svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg><span>Reiniciar</span></button>
+              </div>
+            </div>
+            <ol class="steps" id="brew-steps"></ol>
+            <p class="brew__grind" id="brew-grind"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="buy" id="comprar" aria-labelledby="buy-title">
+      <div class="wrap">
+        <h2 id="buy-title" data-reveal="blur" data-glow-text>Llévate este lote</h2>
+        <p class="lede" data-reveal="blur">La compra se completa en rastrotienda.cl. Cada lote viene en 125 g o 250 g, con la molienda que prefieras.</p>
+        <ul class="rows" id="rows"></ul>
+        <p class="grinds">Moliendas: grano entero (recomendado), gruesa (francesa), media (V60) y fina (espresso doméstica).</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="footer__brand">RASTRO</p>
+    <p>Café de especialidad. Cada café debe poder seguirse.</p>
+    <details class="credits">
+      <summary>Créditos de las fotos</summary>
+      <p>Las imágenes de la finca, el tostador, los logotipos y los vasos son de la tienda RASTRO. Las fotos de los utensilios son de Wikimedia Commons, recortadas del fondo:</p>
+      <ul id="credits"></ul>
+    </details>
+    <p class="footer__credit">Mapa: Esri, USGS, NOAA. Hecho con <a href="https://leafletjs.com">Leaflet</a>.</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

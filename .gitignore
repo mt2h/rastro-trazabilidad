@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+# Impeccable working files: screenshots, decision mocks, references and local config.
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/reference/
+.impeccable/config.local.json
+.impeccable/questions-payload.json
